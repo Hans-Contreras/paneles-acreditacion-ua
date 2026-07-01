@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paneles de Acreditación · Universidad de Antofagasta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#16202e;--ink-2:#3a4c60;--paper:#eef0ee;--card:#ffffff;--line:#e2e2dc;--copper:#b5622f;--teal:#127a6c;--shadow:0 1px 2px rgba(22,32,46,.04),0 10px 30px rgba(22,32,46,.07)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;min-height:100vh;display:flex;align-items:center;padding:40px 20px}
+  .wrap{max-width:900px;margin:0 auto;width:100%}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:10px}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,44px);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .lead{color:var(--ink-2);font-size:15px;margin-top:10px;max-width:56ch}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;box-shadow:var(--shadow);transition:transform .18s ease,border-color .18s ease}
+  a.card:hover{transform:translateY(-3px);border-color:var(--copper)}
+  .card .k{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+  .card h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;margin:8px 0 6px;letter-spacing:-.01em}
+  .card p{font-size:13.5px;color:var(--ink-2)}
+  .card .go{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;font-weight:600;color:var(--copper)}
+  .foot{margin-top:34px;font-size:12px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:16px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Universidad de Antofagasta · Aseguramiento de la Calidad</div>
+  <h1>Paneles de Acreditación</h1>
+  <p class="lead">Seguimiento en vivo del estado de acreditación CNA de los programas, conectado a la base de datos institucional. Los indicadores se actualizan al editar la planilla.</p>
+  <div class="grid">
+    <a class="card" href="postgrado.html">
+      <div class="k">Postgrado</div>
+      <h2>Doctorado, Magíster y Especialidades</h2>
+      <p>Acreditación por tipo de programa, composición del estado, vigencias y programas en proceso.</p>
+      <span class="go">Abrir panel →</span>
+    </a>
+    <a class="card" href="pregrado.html">
+      <div class="k">Pregrado obligatorio</div>
+      <h2>Medicina, Odontología y Pedagogías</h2>
+      <p>Cobertura de acreditación, semáforo de vigencias, años otorgados y distribución por facultad.</p>
+      <span class="go">Abrir panel →</span>
+    </a>
+  </div>
+  <div class="foot">Fuente: hoja «dashboard_data» publicada como CSV. Cálculo dinámico en el navegador · Sin datos personales de contacto.</div>
+</div>
+</body>
+</html>

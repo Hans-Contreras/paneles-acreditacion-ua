@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Acreditación · Postgrado UA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --ink:#16202e;--ink-2:#3a4c60;--paper:#eef0ee;--card:#ffffff;--line:#e2e2dc;
+    --copper:#b5622f;--teal:#127a6c;--teal-soft:#e2f0ed;--amber:#c7891c;--amber-soft:#f7edd6;
+    --muted:#98a2af;--muted-soft:#eceef1;--danger:#b0472f;--danger-soft:#f6e2dc;
+    --shadow:0 1px 2px rgba(22,32,46,.04),0 6px 24px rgba(22,32,46,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;padding:32px 20px 64px}
+  .wrap{max-width:1160px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:22px;margin-bottom:26px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .sub{color:var(--ink-2);font-size:14px;margin-top:6px;max-width:56ch}
+  .stamp{text-align:right;font-size:12px;color:var(--ink-2);white-space:nowrap}
+  .stamp b{color:var(--ink);font-family:'Space Grotesk',sans-serif;font-weight:600}
+  .sec-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:34px 0 14px;display:flex;align-items:center;gap:10px}
+  .sec-title::before{content:"";width:20px;height:2px;background:var(--copper)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi .lbl{font-size:12px;color:var(--ink-2);font-weight:500}
+  .kpi .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:40px;letter-spacing:-.02em;line-height:1;margin-top:12px;font-variant-numeric:tabular-nums}
+  .kpi .foot{font-size:12px;color:var(--ink-2);margin-top:6px}
+  .kpi .tag{position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%}
+  .types{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .type{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .type h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;letter-spacing:-.01em;margin-bottom:2px}
+  .type .of{font-size:12px;color:var(--ink-2)}
+  .gauge{position:relative;margin:16px 0 10px;height:132px;display:flex;align-items:center;justify-content:center}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .pct b{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+  .gauge .pct span{font-size:11px;color:var(--ink-2);margin-top:3px}
+  .type .brk{display:flex;gap:6px;font-size:11.5px;color:var(--ink-2);flex-wrap:wrap;margin-top:4px}
+  .chip{display:inline-flex;align-items:center;gap:5px;background:var(--paper);padding:3px 9px;border-radius:20px;font-weight:500}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .d-teal{background:var(--teal)}.d-amber{background:var(--amber)}.d-muted{background:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:18px;align-items:start}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .panel h4{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;margin-bottom:2px}
+  .panel .cap{font-size:12px;color:var(--ink-2);margin-bottom:18px}
+  .barrow{margin-bottom:16px}.barrow:last-child{margin-bottom:0}
+  .barrow .top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px}
+  .barrow .top .name{font-weight:600}.barrow .top .val{color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .track{display:flex;height:26px;border-radius:7px;overflow:hidden;background:var(--muted-soft)}
+  .seg{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;transition:width .9s cubic-bezier(.2,.8,.2,1);min-width:0}
+  .seg.s-teal{background:var(--teal)}.seg.s-amber{background:var(--amber)}.seg.s-muted{background:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:12px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .dlist{flex:1;min-width:160px}
+  .dlist .li{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .dlist .li:last-child{border-bottom:none}
+  .dlist .li .l{display:flex;align-items:center;gap:9px}
+  .dlist .li .v{font-family:'Space Grotesk',sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+  .vig{display:flex;flex-direction:column;gap:0}
+  .vitem{display:grid;grid-template-columns:96px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+  .vitem:last-child{border-bottom:none}
+  .vdate{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
+  .vname{font-size:13px;line-height:1.35}.vname .t{font-size:11px;color:var(--ink-2)}
+  .vstate{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .st-crit{background:var(--danger-soft);color:var(--danger)}.st-soon{background:var(--amber-soft);color:#8a5e0f}.st-ok{background:var(--teal-soft);color:#0c5a4f}
+  .grid2b{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .rowlist .rl{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .rowlist .rl:last-child{border-bottom:none}
+  .rowlist .rl .nm{flex:1;font-size:13px}
+  .rowlist .rl .bar{flex:0 0 120px;height:8px;background:var(--muted-soft);border-radius:6px;overflow:hidden}
+  .rowlist .rl .bar i{display:block;height:100%;background:var(--copper);border-radius:6px}
+  .rowlist .rl .n{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;width:26px;text-align:right;font-variant-numeric:tabular-nums}
+  .proc .pi{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .proc .pi:last-child{border-bottom:none}
+  .proc .pi .k{width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:6px;flex:0 0 auto}
+  .proc .pi .nm{font-size:13px;flex:1}.proc .pi .nm .t{font-size:11px;color:var(--ink-2)}
+  .proc .pi .stg{font-size:11px;color:var(--amber);font-weight:600;white-space:nowrap}
+  .note{background:var(--amber-soft);border:1px solid #ecd9ac;border-radius:12px;padding:14px 16px;font-size:12.5px;color:#6f4e12;margin-top:26px;line-height:1.55}
+  .note b{color:#5a3f0e}
+  footer{margin-top:30px;font-size:11.5px;color:var(--ink-2);text-align:center}
+  #status{text-align:center;padding:60px 20px;color:var(--ink-2);font-size:14px}
+  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--copper);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .refresh{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-family:'Inter';font-size:12px;color:var(--ink-2);cursor:pointer;margin-top:8px}
+  .refresh:hover{border-color:var(--copper);color:var(--copper)}
+  @media(max-width:900px){.kpis,.types{grid-template-columns:repeat(2,1fr)}.grid2,.grid2b{grid-template-columns:1fr}}
+  @media(max-width:520px){.kpis,.types{grid-template-columns:1fr}.vitem{grid-template-columns:70px 1fr;grid-template-rows:auto auto}.vstate{grid-column:2}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Universidad de Antofagasta · Área Postgrado</div>
+      <h1>Panel de Acreditación de Postgrado</h1>
+      <p class="sub" id="subtitle">Cargando datos desde la planilla…</p>
+    </div>
+    <div class="stamp">
+      Fuente: Google Sheets (en vivo)<br>
+      Actualizado: <b id="ts">—</b><br>
+      Ámbito: <b>Postgrado</b> (oferta vigente)
+      <br><button class="refresh" onclick="load()">↻ Actualizar</button>
+    </div>
+  </header>
+
+  <div id="status"><div class="spin"></div>Conectando con la base de datos…</div>
+  <div id="content" style="display:none">
+    <div class="kpis" id="kpis"></div>
+    <div class="sec-title">Acreditación por tipo de programa</div>
+    <p class="sub" id="typeCap" style="margin:-4px 0 16px"></p>
+    <div class="types" id="types"></div>
+    <div class="sec-title">Composición del estado por tipo</div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>Programas por estado y tipo</h4>
+        <p class="cap">Distribución absoluta (solo oferta vigente): acreditados, en proceso y no acreditados.</p>
+        <div id="bars"></div>
+        <div class="legend">
+          <span><i class="dot d-teal"></i> Acreditado</span>
+          <span><i class="dot d-amber"></i> En proceso de acreditación</span>
+          <span><i class="dot d-muted"></i> No acreditado</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Estado global del postgrado</h4>
+        <p class="cap" id="donutCap"></p>
+        <div class="donut-wrap"><div id="donut"></div><div class="dlist" id="donutList"></div></div>
+      </div>
+    </div>
+    <div class="sec-title">Vigencia de las acreditaciones</div>
+    <div class="panel">
+      <h4>Próximos vencimientos de acreditación</h4>
+      <p class="cap">Programas acreditados ordenados por fecha de término de vigencia.</p>
+      <div class="vig" id="vig"></div>
+    </div>
+    <div class="sec-title">Distribución y programas en proceso</div>
+    <div class="grid2b">
+      <div class="panel">
+        <h4>Postgrado por área del conocimiento (SIES)</h4>
+        <p class="cap" id="areaCap"></p>
+        <div class="rowlist" id="areas"></div>
+      </div>
+      <div class="panel">
+        <h4>Programas en proceso de acreditación</h4>
+        <p class="cap">Autoevaluación en curso o a la espera de resolución CNA.</p>
+        <div class="proc" id="proc"></div>
+      </div>
+    </div>
+    <div class="note">Panel conectado en vivo a la planilla publicada. Los datos publicados por Google pueden tardar unos minutos en propagarse tras editar el Excel/Sheet. Los porcentajes se calculan sobre el total con oferta vigente de cada tipo.</div>
+    <footer>Fuente: hoja «dashboard_data» publicada como CSV. Cálculo dinámico en el navegador.</footer>
+  </div>
+</div>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB3SzgWBmVkv4u4yC11ebw2MfLk5JzJA6k2-GAsbrIie5kh-e-T8IXbZqlyCM_BfKIiM3bDi49bguj/pub?gid=1393971926&single=true&output=csv";
+const TYPE_ORDER = ["Doctorado","Magíster","Especialidad Médica","Especialidad Odontológica"];
+const MESES={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
+const MS=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const norm=v=>(v==null?"":String(v)).trim();
+const isVig=r=>["sí","si"].includes(norm(r["Oferta Vigente"]).toLowerCase());
+const isAcred=r=>norm(r["Estado"]).toLowerCase()==="acreditado";
+const isProc=r=>/proceso/i.test(norm(r["Estado"]));
+const isNo=r=>/^no acred/i.test(norm(r["Estado"]));
+function activeStage(r){const e=norm(r["Etapa"]).toLowerCase();return e.startsWith("autoevaluaci")||e.includes("espera de decisi");}
+function parseVig(txt){if(!txt)return null;const m=norm(txt).toLowerCase().match(/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*(?:de\s*)?(\d{4})/);if(!m)return null;return new Date(parseInt(m[2],10),MESES[m[1]]+1,0);}
+function statusOf(d){if(!d)return{s:"ok",lbl:"Vigente"};const now=new Date();const in12=new Date();in12.setMonth(in12.getMonth()+12);if(d<now)return{s:"crit",lbl:"Vigencia superada"};if(d<in12)return{s:"soon",lbl:"< 12 meses"};return{s:"ok",lbl:"Vigente"};}
+const parseAnios=s=>{const m=norm(s).match(/(\d+)/);return m?parseInt(m[1],10):null;};
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const R=52,C=2*Math.PI*R;
+
+function load(){
+  document.getElementById('status').style.display='block';
+  document.getElementById('content').style.display='none';
+  document.getElementById('status').innerHTML='<div class="spin"></div>Conectando con la base de datos…';
+  Papa.parse(CSV_URL+"&_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
+    complete:res=>{try{render(res.data);}catch(e){err(e.message);}},
+    error:e=>err(e.message)});
+}
+function err(m){document.getElementById('status').innerHTML='No se pudo cargar la planilla.<br><small>'+m+'</small><br><button class="refresh" onclick="load()">Reintentar</button>';}
+
+function render(rows){
+  rows=rows.filter(r=>norm(r["Programa"]));
+  const postAll=rows.filter(r=>norm(r["Nivel"]).toLowerCase()==="postgrado");
+  const post=postAll.filter(isVig);
+  const acred=post.filter(isAcred), proc=post.filter(isProc), no=post.filter(isNo);
+  const activos=post.filter(r=>!isAcred(r)&&activeStage(r));
+
+  document.getElementById('subtitle').innerHTML=`Estado de acreditación CNA de los programas de postgrado, diferenciado por tipo. Considera los <b>${post.length} programas con oferta vigente</b> (de ${postAll.length} en el maestro de seguimiento).`;
+  document.getElementById('ts').textContent=new Date().toLocaleString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  // KPIs
+  const kpi=(tag,lbl,num,foot,col)=>`<div class="kpi"><span class="tag" style="background:${tag}"></span><div class="lbl">${lbl}</div><div class="num" ${col?`style="color:${col}"`:''}>${num}</div><div class="foot">${foot}</div></div>`;
+  document.getElementById('kpis').innerHTML=
+    kpi('var(--ink)','Programas de postgrado',post.length,'Con oferta vigente')+
+    kpi('var(--teal)','Programas acreditados',acred.length,`De ${post.length} con oferta vigente`,'var(--teal)')+
+    kpi('var(--copper)','% de acreditación global',pct(acred.length,post.length)+'<span style="font-size:22px">%</span>',`${acred.length} de ${post.length} con oferta vigente`,'var(--copper)')+
+    kpi('var(--amber)','En proceso activo',activos.length,'Autoevaluación o en resolución','var(--amber)');
+
+  // Types
+  document.getElementById('typeCap').innerHTML=`Considera únicamente programas con <b>oferta vigente</b> — ${post.length} de ${postAll.length} de postgrado. El porcentaje es acreditados sobre el total con oferta vigente de cada tipo.`;
+  document.getElementById('types').innerHTML=TYPE_ORDER.map(t=>{
+    const sub=post.filter(r=>norm(r["Tipo de Programa"])===t);
+    const a=sub.filter(isAcred).length,p=sub.filter(isProc).length,n=sub.filter(isNo).length,tot=sub.length;
+    const pc=pct(a,tot),off=C*(1-pc/100),col=pc>0?'var(--teal)':'var(--muted)';
+    return `<div class="type"><h3>${t}</h3><div class="of">${a} de ${tot} acreditados</div>
+      <div class="gauge"><svg width="132" height="132" viewBox="0 0 132 132">
+      <circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--muted-soft)" stroke-width="13"/>
+      <circle cx="66" cy="66" r="${R}" fill="none" stroke="${col}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${off}" class="arc"/></svg>
+      <div class="pct"><b style="color:${col}">${pc}%</b><span>acreditado</span></div></div>
+      <div class="brk"><span class="chip"><i class="dot d-teal"></i>${a} acred.</span>${p?`<span class="chip"><i class="dot d-amber"></i>${p} proc.</span>`:''}<span class="chip"><i class="dot d-muted"></i>${n} no acred.</span></div></div>`;
+  }).join('');
+
+  // Bars
+  document.getElementById('bars').innerHTML=TYPE_ORDER.map(t=>{
+    const sub=post.filter(r=>norm(r["Tipo de Programa"])===t);
+    const a=sub.filter(isAcred).length,p=sub.filter(isProc).length,n=sub.filter(isNo).length,tot=sub.length||1;
+    return `<div class="barrow"><div class="top"><span class="name">${t}</span><span class="val">${a}/${sub.length} · ${pct(a,sub.length)}%</span></div>
+      <div class="track">
+      <div class="seg s-teal" style="width:0" data-w="${a/tot*100}">${a||''}</div>
+      <div class="seg s-amber" style="width:0" data-w="${p/tot*100}">${p||''}</div>
+      <div class="seg s-muted" style="width:0" data-w="${n/tot*100}">${n||''}</div></div></div>`;
+  }).join('');
+
+  // Donut
+  document.getElementById('donutCap').textContent=`${post.length} programas con oferta vigente.`;
+  document.getElementById('donutList').innerHTML=
+    `<div class="li"><div class="l"><span class="dot d-teal"></span>Acreditado</div><div class="v">${acred.length}</div></div>
+     <div class="li"><div class="l"><span class="dot d-amber"></span>En proceso</div><div class="v">${proc.length}</div></div>
+     <div class="li"><div class="l"><span class="dot d-muted"></span>No acreditado</div><div class="v">${no.length}</div></div>`;
+  drawDonut([{v:acred.length,c:"var(--teal)"},{v:proc.length,c:"var(--amber)"},{v:no.length,c:"var(--muted)"}],post.length);
+
+  // Vigencia
+  const vlist=acred.map(r=>{const d=parseVig(r["Vigencia Acreditación (Texto)"]);const st=statusOf(d);
+    return{d,st,name:norm(r["Programa"]),tipo:norm(r["Tipo de Programa"]),anios:norm(r["Años Acreditación"])};})
+    .sort((a,b)=>(a.d?a.d.getTime():Infinity)-(b.d?b.d.getTime():Infinity));
+  document.getElementById('vig').innerHTML=vlist.map(v=>`<div class="vitem">
+    <span class="vdate">${v.d?MS[v.d.getMonth()]+' '+v.d.getFullYear():'—'}</span>
+    <span class="vname">${titleCase(v.name)}<div class="t">${v.tipo}${v.anios?' · '+v.anios.toLowerCase():''}</div></span>
+    <span class="vstate st-${v.st.s}">${v.st.lbl}</span></div>`).join('');
+
+  // Areas (oferta vigente)
+  document.getElementById('areaCap').textContent=`${post.length} programas con oferta vigente.`;
+  const areas=groupCount(post,"Área del Conocimiento (SIES)");
+  const amax=Math.max(...areas.map(a=>a[1]),1);
+  document.getElementById('areas').innerHTML=areas.map(a=>`<div class="rl"><span class="nm">${a[0]}</span><span class="bar"><i style="width:${a[1]/amax*100}%"></i></span><span class="n">${a[1]}</span></div>`).join('');
+
+  // En proceso
+  document.getElementById('proc').innerHTML=activos.length?activos.map(r=>`<div class="pi"><span class="k"></span><span class="nm">${titleCase(norm(r["Programa"]))}<div class="t">${norm(r["Tipo de Programa"])}</div></span><span class="stg">${norm(r["Etapa"])}</span></div>`).join(''):'<div style="font-size:13px;color:var(--ink-2)">Sin programas en proceso activo.</div>';
+
+  document.getElementById('status').style.display='none';
+  document.getElementById('content').style.display='block';
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll('.arc').forEach(a=>{a.style.transition='stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)';a.style.strokeDashoffset=a.dataset.off;});
+    document.querySelectorAll('.track .seg').forEach(s=>{s.style.width=s.dataset.w+'%';});
+  },120));
+}
+
+function drawDonut(data,tot){
+  const r=54,cx=70,cy=70,sw=22,circ=2*Math.PI*r;let acc=0,segs="";
+  data.forEach(d=>{const f=tot?d.v/tot:0,dash=f*circ;
+    segs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.c}" stroke-width="${sw}" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-acc*circ}" transform="rotate(-90 ${cx} ${cy})"/>`;acc+=f;});
+  const p=tot?Math.round(data[0].v/tot*100):0;
+  document.getElementById('donut').innerHTML=`<svg width="140" height="140" viewBox="0 0 140 140">${segs}
+    <text x="70" y="65" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="30" fill="var(--ink)">${p}%</text>
+    <text x="70" y="84" text-anchor="middle" font-family="Inter" font-size="11" fill="var(--ink-2)">acreditado</text></svg>`;
+}
+function groupCount(rows,key){const m={};rows.forEach(r=>{const k=norm(r[key])||"Sin clasificar";m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+function titleCase(s){return s.toLowerCase().replace(/\b([a-záéíóúñ])/g,c=>c.toUpperCase()).replace(/\b(De|La|El|En|Y|Del|Los|Las|Para)\b/g,w=>w.toLowerCase());}
+
+load();
+</script>
+</body>
+</html>
