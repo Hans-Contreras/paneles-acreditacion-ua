@@ -18,6 +18,13 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;padding:32px 20px 64px}
   .wrap{max-width:1160px;margin:0 auto}
+  .topnav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .brand{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none}
+  .brand:hover{color:var(--copper)}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:var(--shadow)}
+  .seg a{font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:7px 16px;border-radius:7px;transition:background .15s,color .15s}
+  .seg a:hover{color:var(--ink)}
+  .seg a.on{background:var(--ink);color:#fff}
   header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:22px;margin-bottom:26px;border-bottom:2px solid var(--ink)}
   .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
   h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.05}
@@ -96,6 +103,13 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="topnav">
+    <a class="brand" href="index.html">← Paneles de Acreditación UA</a>
+    <div class="seg">
+      <a href="postgrado.html" class="on">Postgrado</a>
+      <a href="pregrado.html">Pregrado obligatorio</a>
+    </div>
+  </nav>
   <header>
     <div>
       <div class="eyebrow">Universidad de Antofagasta · Área Postgrado</div>
