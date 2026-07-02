@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Oferta Académica · Universidad de Antofagasta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --ink:#16202e;--ink-2:#3a4c60;--paper:#eef0ee;--card:#ffffff;--line:#e2e2dc;
+    --copper:#b5622f;--teal:#127a6c;--teal-soft:#e2f0ed;--amber:#c7891c;--amber-soft:#f7edd6;
+    --muted:#98a2af;--muted-soft:#eceef1;--danger:#b0472f;--danger-soft:#f6e2dc;--blue:#1b57a6;
+    --shadow:0 1px 2px rgba(22,32,46,.04),0 6px 24px rgba(22,32,46,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;padding:32px 20px 64px}
+  .wrap{max-width:1160px;margin:0 auto}
+  .topnav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .brand{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none}
+  .brand:hover{color:var(--copper)}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .seg a{font-size:13px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:7px 14px;border-radius:7px;transition:background .15s,color .15s}
+  .seg a:hover{color:var(--ink)}
+  .seg a.on{background:var(--ink);color:#fff}
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:22px;margin-bottom:26px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .sub{color:var(--ink-2);font-size:14px;margin-top:6px;max-width:58ch}
+  .stamp{text-align:right;font-size:12px;color:var(--ink-2);white-space:nowrap}
+  .stamp b{color:var(--ink);font-family:'Space Grotesk',sans-serif;font-weight:600}
+  .logo-dac{height:130px;width:auto;display:block;margin-bottom:16px}
+  .yearbar{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .yearbar label{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
+  select#year{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer;box-shadow:var(--shadow)}
+  .sec-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:34px 0 14px;display:flex;align-items:center;gap:10px}
+  .sec-title::before{content:"";width:20px;height:2px;background:var(--copper)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi .lbl{font-size:12px;color:var(--ink-2);font-weight:500}
+  .kpi .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:36px;letter-spacing:-.02em;line-height:1;margin-top:12px;font-variant-numeric:tabular-nums}
+  .kpi .foot{font-size:12px;color:var(--ink-2);margin-top:6px}
+  .kpi .tag{position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%}
+  .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .lvl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .lvl .h{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600}
+  .lvl .big{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;margin:8px 0 2px;font-variant-numeric:tabular-nums}
+  .lvl .meta{font-size:12px;color:var(--ink-2)}
+  .lvl .track{display:flex;height:8px;border-radius:6px;overflow:hidden;background:var(--muted-soft);margin-top:12px}
+  .lvl .track i{display:block;height:100%}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .panel h4{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;margin-bottom:2px}
+  .panel .cap{font-size:12px;color:var(--ink-2);margin-bottom:18px}
+  .rowlist .rl{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .rowlist .rl:last-child{border-bottom:none}
+  .rowlist .rl .nm{flex:1;font-size:13px}
+  .rowlist .rl .bar{flex:0 0 110px;height:8px;background:var(--muted-soft);border-radius:6px;overflow:hidden}
+  .rowlist .rl .bar i{display:block;height:100%;background:var(--copper);border-radius:6px}
+  .rowlist .rl .n{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;width:30px;text-align:right;font-variant-numeric:tabular-nums}
+  .barrow{margin-bottom:14px}.barrow:last-child{margin-bottom:0}
+  .barrow .top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px}
+  .barrow .top .name{font-weight:600}.barrow .top .val{color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .track2{display:flex;height:24px;border-radius:7px;overflow:hidden;background:var(--muted-soft)}
+  .seg2{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;min-width:0}
+  .s-teal{background:var(--teal)}.s-muted{background:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .d-teal{background:var(--teal)}.d-muted{background:var(--muted)}.d-blue{background:var(--blue)}.d-copper{background:var(--copper)}
+  footer{margin-top:30px;font-size:11.5px;color:var(--ink-2);text-align:center}
+  .search-panel input{width:100%;font-family:'Inter',sans-serif;font-size:14px;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);outline:none}
+  .search-panel input:focus{border-color:var(--copper)}
+  .results{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .res-count{font-size:12px;color:var(--ink-2);margin-bottom:2px}
+  .res-empty{font-size:13px;color:var(--ink-2);padding:6px 0}
+  .rescard{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--paper)}
+  .rescard .rt{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--ink)}
+  .rescard .rs{font-size:12px;color:var(--ink-2);margin:2px 0 12px}
+  .rescard .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px}
+  .rescard .f .k{color:var(--ink-2);display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+  .rescard .f .v{color:var(--ink);font-weight:500;font-size:12.5px}
+  .logo-cna{height:100px;width:auto;display:block;margin:0 auto 12px}
+  #status{text-align:center;padding:60px 20px;color:var(--ink-2);font-size:14px}
+  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--copper);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 14px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .refresh{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-family:'Inter';font-size:12px;color:var(--ink-2);cursor:pointer;margin-top:8px}
+  .refresh:hover{border-color:var(--copper);color:var(--copper)}
+  .setup{max-width:640px;margin:0 auto;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+  .setup code{background:var(--muted-soft);padding:2px 6px;border-radius:5px;font-size:12px;word-break:break-all}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.levels{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+  @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="topnav">
+    <a class="brand" href="./">← Paneles de Acreditación UA</a>
+    <div class="seg">
+      <a href="postgrado.html">Postgrado</a>
+      <a href="pregrado.html">Pregrado obligatorio</a>
+      <a href="oferta.html" class="on">Oferta académica</a>
+    </div>
+  </nav>
+  <header>
+    <div>
+      <img class="logo-dac" src="assets/logo-dac.png" alt="Dirección de Aseguramiento de la Calidad · Universidad de Antofagasta">
+      <div class="eyebrow">Universidad de Antofagasta · Oferta Académica SIES</div>
+      <h1>Panel de Oferta Académica</h1>
+      <p class="sub" id="subtitle">Cargando datos desde la planilla…</p>
+    </div>
+    <div class="stamp">
+      Fuente: SIES · Google Sheets<br>
+      Actualizado: <b id="ts">—</b><br>
+      Ámbito: <b>Universidad de Antofagasta</b>
+      <br><button class="refresh" onclick="load()">↻ Actualizar</button>
+    </div>
+  </header>
+
+  <div id="status"><div class="spin"></div>Conectando con la base de datos…</div>
+
+  <div id="content" style="display:none">
+    <div class="yearbar">
+      <label for="year">Año de oferta</label>
+      <select id="year" onchange="render(this.value)"></select>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="sec-title">Buscador de programas</div>
+    <div class="panel search-panel">
+      <input id="q" type="text" placeholder="Buscar por nombre de carrera, código único, título o grado académico…" oninput="doSearch()" autocomplete="off">
+      <div id="results" class="results"></div>
+    </div>
+
+    <div class="sec-title">Oferta por nivel formativo</div>
+    <div class="levels" id="levels"></div>
+
+    <div class="sec-title">Composición de la oferta</div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>Por nivel de carrera</h4>
+        <p class="cap" id="nivelCap"></p>
+        <div class="rowlist" id="nivelCarrera"></div>
+      </div>
+      <div class="panel">
+        <h4>Por área del conocimiento</h4>
+        <p class="cap" id="areaCap"></p>
+        <div class="rowlist" id="areas"></div>
+      </div>
+    </div>
+
+    <div class="sec-title">Acreditación, modalidad y jornada</div>
+    <div class="grid2">
+      <div class="panel">
+        <h4>Acreditación por nivel</h4>
+        <p class="cap" id="acredCap"></p>
+        <div id="acred"></div>
+        <div class="legend">
+          <span><i class="dot d-teal"></i> Acreditada</span>
+          <span><i class="dot d-muted"></i> No acreditada</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h4>Modalidad y jornada</h4>
+        <p class="cap">Distribución de los programas ofertados.</p>
+        <div class="rowlist" id="modalidad"></div>
+        <div style="height:10px"></div>
+        <div class="rowlist" id="jornada"></div>
+      </div>
+    </div>
+
+    <div class="sec-title">Evolución de la oferta (2010 – 2026)</div>
+    <div class="panel">
+      <h4>Programas ofertados por año</h4>
+      <p class="cap" id="trendCap">Total de programas en la oferta anual. El punto marcado corresponde al año seleccionado.</p>
+      <div id="trend"></div>
+    </div>
+
+    <footer>
+      <img class="logo-cna" src="assets/logo-ua-cna.png" alt="Universidad de Antofagasta acreditada · CNA Chile">
+      Fuente: Datos SIES (Servicio de Información de Educación Superior), Unidad de Planificación de Procesos, Dirección de Aseguramiento de la Calidad — Universidad de Antofagasta.<br>Elaborado por Hans Contreras Robledo.
+    </footer>
+  </div>
+</div>
+
+<script>
+const CSV_URL = "PEGAR_AQUI_URL_CSV_oferta_data";
+const NIVEL_ORDER = ["Pregrado","Posgrado","Postítulo"];
+const norm=v=>(v==null?"":String(v)).trim();
+const num=v=>{const n=parseFloat(String(v).replace(/[^\d.-]/g,''));return isNaN(n)?0:n;};
+const isAcred=r=>/^acreditada/i.test(norm(r["Acreditación Carrera o Programa"]));
+const fmt=n=>Math.round(n).toLocaleString('es-CL');
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+let ROWS=[], YEARS=[], CUR_YEAR=null;
+
+function load(){
+  document.getElementById('status').style.display='block';
+  document.getElementById('content').style.display='none';
+  if(!/^https?:\/\//.test(CSV_URL)){
+    document.getElementById('status').innerHTML=`<div class="setup"><b>Falta conectar la fuente de datos.</b><br><br>
+      1. Sube <code>Oferta_UA_SIES_para_Sheets.xlsx</code> a Google Sheets (o pégalo como pestaña <code>oferta_data</code>).<br>
+      2. Archivo → Compartir → Publicar en la web → publica esa pestaña como CSV.<br>
+      3. Reemplaza la constante <code>CSV_URL</code> al inicio del script de <code>oferta.html</code> con el enlace publicado.<br><br>
+      Estructura esperada de columnas: Año, Código Único, Nivel Global, Nivel Carrera, Nombre Carrera, Área Carrera Genérica, Versión, Área del conocimiento, Acreditación Carrera o Programa, Modalidad, Jornada, Nombre Título, Grado Académico, Año Inicio, Vacantes Semestre Uno, Vacantes Semestre Dos, Arancel Anual.</div>`;
+    return;
+  }
+  document.getElementById('status').innerHTML='<div class="spin"></div>Conectando con la base de datos…';
+  Papa.parse(CSV_URL+"&_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
+    complete:res=>{try{init(res.data);}catch(e){err(e.message);}},error:e=>err(e.message)});
+}
+function err(m){document.getElementById('status').innerHTML='No se pudo cargar la planilla.<br><small>'+m+'</small><br><button class="refresh" onclick="load()">Reintentar</button>';}
+
+function init(rows){
+  ROWS=rows.filter(r=>norm(r["Nombre Carrera"])&&norm(r["Año"]));
+  YEARS=[...new Set(ROWS.map(r=>norm(r["Año"])))].filter(Boolean).sort();
+  const sel=document.getElementById('year');
+  sel.innerHTML=YEARS.map(y=>`<option value="${y}">${y}</option>`).join('');
+  const latest=YEARS[YEARS.length-1];
+  sel.value=latest;
+  document.getElementById('ts').textContent=new Date().toLocaleString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('status').style.display='none';
+  document.getElementById('content').style.display='block';
+  render(latest);
+}
+
+function vacRow(r){return num(r["Vacantes Semestre Uno"])+num(r["Vacantes Semestre Dos"]);}
+
+function render(year){
+  CUR_YEAR=year;
+  const d=ROWS.filter(r=>norm(r["Año"])===year);
+  const preg=d.filter(r=>norm(r["Nivel Global"])==="Pregrado");
+  const posg=d.filter(r=>norm(r["Nivel Global"])==="Posgrado");
+  const post=d.filter(r=>norm(r["Nivel Global"])==="Postítulo");
+  const vac=d.reduce((s,r)=>s+vacRow(r),0);
+  const acred=d.filter(isAcred).length;
+  const arList=preg.map(r=>num(r["Arancel Anual"])).filter(x=>x>0);
+  const arProm=arList.length?arList.reduce((a,b)=>a+b,0)/arList.length:0;
+
+  document.getElementById('subtitle').innerHTML=`Seguimiento de la oferta académica de la Universidad de Antofagasta informada al SIES. Año <b>${year}</b>: ${d.length} programas ofertados.`;
+
+  // KPIs
+  const kpi=(tag,lbl,num,foot,col)=>`<div class="kpi"><span class="tag" style="background:${tag}"></span><div class="lbl">${lbl}</div><div class="num" ${col?`style="color:${col}"`:''}>${num}</div><div class="foot">${foot}</div></div>`;
+  document.getElementById('kpis').innerHTML=
+    kpi('var(--ink)','Programas ofertados',d.length,`Pregrado ${preg.length} · Posgrado ${posg.length} · Postítulo ${post.length}`)+
+    kpi('var(--blue)','Vacantes ofrecidas',fmt(vac),`Pregrado ${fmt(preg.reduce((s,r)=>s+vacRow(r),0))} vacantes`,'var(--blue)')+
+    kpi('var(--teal)','Programas acreditados',`${acred} · ${pct(acred,d.length)}%`,`De ${d.length} programas ofertados`,'var(--teal)')+
+    kpi('var(--copper)','Arancel promedio pregrado','$'+fmt(arProm),`${arList.length} carreras con arancel informado`,'var(--copper)');
+
+  // Levels
+  const lv=(name,list,color)=>{const v=list.reduce((s,r)=>s+vacRow(r),0);const share=pct(list.length,d.length);
+    return `<div class="lvl"><div class="h">${name}</div><div class="big" style="color:${color}">${list.length}</div>
+      <div class="meta">${share}% de la oferta · ${fmt(v)} vacantes</div>
+      <div class="track"><i style="width:${share}%;background:${color}"></i></div></div>`;};
+  document.getElementById('levels').innerHTML=lv('Pregrado',preg,'var(--teal)')+lv('Postgrado',posg,'var(--blue)')+lv('Postítulo',post,'var(--copper)');
+
+  // Nivel carrera
+  document.getElementById('nivelCap').textContent=`${d.length} programas · año ${year}.`;
+  rowbars('nivelCarrera', groupCount(d,"Nivel Carrera"));
+  // Área
+  document.getElementById('areaCap').textContent=`${d.length} programas · año ${year}.`;
+  rowbars('areas', groupCount(d,"Área del conocimiento"));
+
+  // Acreditación por nivel (stacked)
+  document.getElementById('acredCap').textContent=`Programas acreditados vs. no acreditados · año ${year}.`;
+  document.getElementById('acred').innerHTML=NIVEL_ORDER.map(nv=>{
+    const sub=d.filter(r=>norm(r["Nivel Global"])===nv);if(!sub.length)return'';
+    const a=sub.filter(isAcred).length,n=sub.length-a,tot=sub.length;
+    const label=nv==="Posgrado"?"Postgrado":nv;
+    return `<div class="barrow"><div class="top"><span class="name">${label}</span><span class="val">${a}/${tot} · ${pct(a,tot)}%</span></div>
+      <div class="track2"><div class="seg2 s-teal" style="width:${a/tot*100}%">${a||''}</div><div class="seg2 s-muted" style="width:${n/tot*100}%">${n||''}</div></div></div>`;
+  }).join('');
+
+  // Modalidad / jornada
+  rowbars('modalidad', groupCount(d,"Modalidad"));
+  rowbars('jornada', groupCount(d,"Jornada"));
+
+  // Trend
+  drawTrend(year);
+  // refresh search results for the new year (if an active query)
+  doSearch();
+}
+
+function stripAcc(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function titleCase(s){return norm(s).toLowerCase().replace(/\b([a-záéíóúñ])/g,c=>c.toUpperCase()).replace(/\b(De|La|El|En|Y|Del|Los|Las|Para|Con|A)\b/g,w=>w.toLowerCase());}
+function doSearch(){
+  const input=document.getElementById('q');if(!input)return;
+  const q=stripAcc(norm(input.value).toLowerCase());
+  const box=document.getElementById('results');
+  if(!q){box.innerHTML=`<div class="res-empty">Escribe para buscar dentro de la oferta del año ${CUR_YEAR}.</div>`;return;}
+  const d=ROWS.filter(r=>norm(r["Año"])===CUR_YEAR);
+  const hits=d.filter(r=>stripAcc((norm(r["Nombre Carrera"])+' '+norm(r["Código Único"])+' '+norm(r["Nombre Título"])+' '+norm(r["Grado Académico"])+' '+norm(r["Área Carrera Genérica"])).toLowerCase()).includes(q));
+  if(!hits.length){box.innerHTML=`<div class="res-empty">Sin coincidencias en el año ${CUR_YEAR}. Prueba con otro término o cambia el año.</div>`;return;}
+  const shown=hits.slice(0,12);
+  const f=(k,v)=>`<div class="f"><span class="k">${k}</span><span class="v">${v||'—'}</span></div>`;
+  box.innerHTML=`<div class="res-count">${hits.length} resultado(s)${hits.length>12?' · mostrando 12':''} · año ${CUR_YEAR}</div>`+
+    shown.map(r=>{
+      const vac=vacRow(r), ar=num(r["Arancel Anual"]), ai=norm(r["Año Inicio"]), dur=norm(r["Duración Total"]);
+      return `<div class="rescard">
+        <div class="rt">${titleCase(norm(r["Nombre Carrera"]))}</div>
+        <div class="rs">${norm(r["Código Único"])} · ${norm(r["Nivel Carrera"])} · ${norm(r["Área del conocimiento"])}</div>
+        <div class="fg">
+          ${f('Área carrera genérica',titleCase(norm(r["Área Carrera Genérica"])))}
+          ${f('Versión',norm(r["Versión"])||'—')}
+          ${f('Título',titleCase(norm(r["Nombre Título"])))}
+          ${f('Grado académico',titleCase(norm(r["Grado Académico"])))}
+          ${f('Año de inicio',ai&&ai!=='0'?ai:'—')}
+          ${f('Acreditación',norm(r["Acreditación Carrera o Programa"]))}
+          ${f('Modalidad',norm(r["Modalidad"]))}
+          ${f('Jornada',norm(r["Jornada"]))}
+          ${f('Vacantes',vac)}
+          ${f('Arancel anual',ar>0?'$'+fmt(ar):'—')}
+          ${f('Duración total',dur?dur+' sem.':'—')}
+          ${f('Sede',titleCase(norm(r["Nombre Sede"])))}
+          ${f('Tipo de carrera',norm(r["Tipo Carrera"]))}
+          ${f('Vigencia',norm(r["Vigencia"]))}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function groupCount(rows,key){const m={};rows.forEach(r=>{const k=norm(r[key])||"Sin dato";m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+function rowbars(id,entries){const mx=Math.max(...entries.map(e=>e[1]),1);
+  document.getElementById(id).innerHTML=entries.map(e=>`<div class="rl"><span class="nm">${e[0]}</span><span class="bar"><i style="width:${e[1]/mx*100}%"></i></span><span class="n">${e[1]}</span></div>`).join('');}
+
+function drawTrend(selYear){
+  const series=YEARS.map(y=>({y,v:ROWS.filter(r=>norm(r["Año"])===y).length}));
+  const W=880,H=240,pl=40,pr=16,pt=20,pb=34;
+  const mx=Math.max(...series.map(s=>s.v)),mn=0;
+  const X=i=>pl+(W-pl-pr)*(i/(series.length-1));
+  const Y=v=>pt+(H-pt-pb)*(1-(v-mn)/(mx-mn||1));
+  const pts=series.map((s,i)=>[X(i),Y(s.v)]);
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=line+` L ${X(series.length-1).toFixed(1)} ${H-pb} L ${pl} ${H-pb} Z`;
+  let grid='';for(let g=0;g<=4;g++){const val=Math.round(mx*g/4);const yy=Y(val);grid+=`<line x1="${pl}" y1="${yy}" x2="${W-pr}" y2="${yy}" stroke="var(--line)" stroke-width="1"/><text x="${pl-8}" y="${yy+3}" text-anchor="end" font-size="10" fill="var(--ink-2)">${val}</text>`;}
+  let xlab='';series.forEach((s,i)=>{if(i%2===0||i===series.length-1)xlab+=`<text x="${X(i)}" y="${H-pb+18}" text-anchor="middle" font-size="10" fill="var(--ink-2)">${s.y}</text>`;});
+  let dots='';series.forEach((s,i)=>{const sel=s.y===selYear;dots+=`<circle cx="${X(i)}" cy="${Y(s.v)}" r="${sel?5.5:3}" fill="${sel?'var(--copper)':'var(--card)'}" stroke="${sel?'var(--copper)':'var(--teal)'}" stroke-width="2"/>`;if(sel)dots+=`<text x="${X(i)}" y="${Y(s.v)-12}" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="13" fill="var(--copper)">${s.v}</text>`;});
+  document.getElementById('trend').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet">
+    ${grid}<path d="${area}" fill="var(--teal-soft)"/><path d="${line}" fill="none" stroke="var(--teal)" stroke-width="2.5"/>${dots}${xlab}</svg>`;
+}
+
+load();
+</script>
+</body>
+</html>
