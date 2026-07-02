@@ -35,6 +35,11 @@
   .yearbar{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
   .yearbar label{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}
   select#year{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer;box-shadow:var(--shadow)}
+  .vigtoggle{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:3px;box-shadow:var(--shadow)}
+  .vt{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;color:var(--ink-2);background:none;border:none;padding:7px 13px;border-radius:6px;cursor:pointer;transition:background .15s,color .15s}
+  .vt:hover{color:var(--ink)}
+  .vt.on{background:var(--teal);color:#fff}
+  .vighint{font-size:11.5px;color:var(--ink-2);margin:6px 0 0}
   .sec-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:34px 0 14px;display:flex;align-items:center;gap:10px}
   .sec-title::before{content:"";width:20px;height:2px;background:var(--copper)}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -125,7 +130,12 @@
     <div class="yearbar">
       <label for="year">Año de oferta</label>
       <select id="year" onchange="render(this.value)"></select>
+      <div class="vigtoggle">
+        <button class="vt on" data-mode="all" onclick="setVig('all')">Toda la oferta</button>
+        <button class="vt" data-mode="vig" onclick="setVig('vig')">Solo oferta vigente</button>
+      </div>
     </div>
+    <p class="vighint">«Oferta vigente» = programas vigentes con estudiantes nuevos (excluye los vigentes sin nuevos ingresos), criterio equiparable al de los paneles de acreditación.</p>
 
     <div class="kpis" id="kpis"></div>
 
@@ -194,7 +204,9 @@ const num=v=>{const n=parseInt(String(v).replace(/[^\d-]/g,''),10);return isNaN(
 const isAcred=r=>/^acreditada/i.test(norm(r["Acreditación Carrera o Programa"]));
 const fmt=n=>Math.round(n).toLocaleString('es-CL');
 const pct=(a,b)=>b?Math.round(a/b*100):0;
-let ROWS=[], YEARS=[], CUR_YEAR=null;
+let ROWS=[], YEARS=[], CUR_YEAR=null, VIG='all';
+function vigOK(r){return /con estudiantes nuevos/i.test(norm(r["Vigencia"]));}
+function setVig(m){VIG=m;document.querySelectorAll('.vt').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));if(CUR_YEAR)render(CUR_YEAR);}
 
 function load(){
   document.getElementById('status').style.display='block';
@@ -230,7 +242,9 @@ function vacRow(r){return num(r["Vacantes Semestre Uno"])+num(r["Vacantes Semest
 
 function render(year){
   CUR_YEAR=year;
-  const d=ROWS.filter(r=>norm(r["Año"])===year);
+  let d=ROWS.filter(r=>norm(r["Año"])===year);
+  if(VIG==='vig') d=d.filter(vigOK);
+  const totalYear=ROWS.filter(r=>norm(r["Año"])===year).length;
   const preg=d.filter(r=>norm(r["Nivel Global"])==="Pregrado");
   const posg=d.filter(r=>norm(r["Nivel Global"])==="Posgrado");
   const post=d.filter(r=>norm(r["Nivel Global"])==="Postítulo");
@@ -239,7 +253,7 @@ function render(year){
   const arList=preg.map(r=>num(r["Arancel Anual"])).filter(x=>x>0);
   const arProm=arList.length?arList.reduce((a,b)=>a+b,0)/arList.length:0;
 
-  document.getElementById('subtitle').innerHTML=`Seguimiento de la oferta académica de la Universidad de Antofagasta informada al SIES. Año <b>${year}</b>: ${d.length} programas ofertados.`;
+  document.getElementById('subtitle').innerHTML=`Seguimiento de la oferta académica de la Universidad de Antofagasta informada al SIES. Año <b>${year}</b>: ${d.length} programas${VIG==='vig'?` con oferta vigente (de ${totalYear} en total)`:' ofertados'}.`;
 
   // KPIs
   const kpi=(tag,lbl,num,foot,col)=>`<div class="kpi"><span class="tag" style="background:${tag}"></span><div class="lbl">${lbl}</div><div class="num" ${col?`style="color:${col}"`:''}>${num}</div><div class="foot">${foot}</div></div>`;
@@ -326,7 +340,7 @@ function rowbars(id,entries){const mx=Math.max(...entries.map(e=>e[1]),1);
   document.getElementById(id).innerHTML=entries.map(e=>`<div class="rl"><span class="nm">${e[0]}</span><span class="bar"><i style="width:${e[1]/mx*100}%"></i></span><span class="n">${e[1]}</span></div>`).join('');}
 
 function drawTrend(selYear){
-  const series=YEARS.map(y=>({y,v:ROWS.filter(r=>norm(r["Año"])===y).length}));
+  const series=YEARS.map(y=>({y,v:ROWS.filter(r=>norm(r["Año"])===y&&(VIG!=='vig'||vigOK(r))).length}));
   const W=880,H=240,pl=40,pr=16,pt=20,pb=34;
   const mx=Math.max(...series.map(s=>s.v)),mn=0;
   const X=i=>pl+(W-pl-pr)*(i/(series.length-1));
