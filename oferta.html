@@ -187,10 +187,10 @@
 </div>
 
 <script>
-const CSV_URL = "PEGAR_AQUI_URL_CSV_oferta_data";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtm2M25FF3mSo6DVCW_pb7fXgTlCR73W20Iy2doyic4vNFOSC5_o_CXPvBqtUVAw/pub?gid=1576346305&single=true&output=csv";
 const NIVEL_ORDER = ["Pregrado","Posgrado","Postítulo"];
 const norm=v=>(v==null?"":String(v)).trim();
-const num=v=>{const n=parseFloat(String(v).replace(/[^\d.-]/g,''));return isNaN(n)?0:n;};
+const num=v=>{const n=parseInt(String(v).replace(/[^\d-]/g,''),10);return isNaN(n)?0:n;};
 const isAcred=r=>/^acreditada/i.test(norm(r["Acreditación Carrera o Programa"]));
 const fmt=n=>Math.round(n).toLocaleString('es-CL');
 const pct=(a,b)=>b?Math.round(a/b*100):0;
