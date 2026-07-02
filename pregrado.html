@@ -218,7 +218,7 @@ function render(rows){
   const fac=groupCount(preg,"Facultad/Centro");const fmax=Math.max(...fac.map(f=>f[1]),1);
   document.getElementById('fac').innerHTML=fac.map(f=>`<div class="rl"><span class="nm">${f[0]}</span><span class="bar"><i style="width:${f[1]/fmax*100}%"></i></span><span class="n">${f[1]}</span></div>`).join('');
 
-  document.getElementById('note').innerHTML=`<b>Alerta de gestión:</b> según la base, ${vencidas.length} de los ${preg.length} programas registran una fecha de vigencia ya superada. Al tratarse de acreditación obligatoria, es probable que estén en re-acreditación o con prórroga por el art. 58 de la Ley 21.526.`;
+  document.getElementById('note').innerHTML=`<b>Nota:</b> según la base, ${vencidas.length} de los ${preg.length} programas registran una fecha de vigencia ya superada. Al tratarse de acreditación obligatoria, es probable que estén en re-acreditación o con prórroga por el art. 58 de la Ley 21.526.`;
 
   document.getElementById('status').style.display='none';
   document.getElementById('content').style.display='block';
