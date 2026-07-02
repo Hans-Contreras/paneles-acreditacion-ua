@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: paneles-acreditacion-ua
+    runtime: static
+    buildCommand: "echo 'Sitio estatico, sin build'"
+    staticPublishPath: ./
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: "no-cache"
