@@ -29,6 +29,15 @@
   .logo-dac{height:120px;width:auto;display:block;margin-bottom:0px}
   .logo-cna{height:100px;width:auto;display:block;margin:0 auto 10px}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  @media print{
+    @page{margin:12mm}
+    body{padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .topnav,.refresh,.vigtoggle,.yearbar select,#status,.search-panel,.vighint{display:none!important}
+    .panel,.kpi,.type,.lvl,.rescard,a.card,.ambito{box-shadow:none!important;break-inside:avoid}
+    .sec-title,header,h1,h4{break-after:avoid}
+    header{border-color:#000}
+    .kpis,.types,.levels,.grid2,.grid2b{gap:10px}
+  }
 </style>
 </head>
 <body>
@@ -38,6 +47,12 @@
   <h1>Paneles de Acreditación</h1>
   <p class="lead">Seguimiento del estado de acreditación CNA de los programas y carreras, conectado a la base de datos institucional.</p>
   <div class="grid">
+    <a class="card" href="institucional.html">
+      <div class="k">Vista institucional</div>
+      <h2>Consolidado de acreditación</h2>
+      <p>Tasa de acreditación institucional, resumen por ámbito y radar de próximos vencimientos.</p>
+      <span class="go">Abrir panel →</span>
+    </a>
     <a class="card" href="postgrado.html">
       <div class="k">Postgrado</div>
       <h2>Doctorado, Magíster y Especialidades</h2>

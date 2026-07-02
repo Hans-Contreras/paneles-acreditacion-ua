@@ -86,6 +86,15 @@
   .refresh:hover{border-color:var(--copper);color:var(--copper)}
   @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2b{grid-template-columns:1fr}}
   @media(max-width:520px){.kpis,.types{grid-template-columns:1fr}.vitem{grid-template-columns:70px 1fr;grid-template-rows:auto auto}.vstate{grid-column:2}}
+  @media print{
+    @page{margin:12mm}
+    body{padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .topnav,.refresh,.vigtoggle,.yearbar select,#status,.search-panel,.vighint{display:none!important}
+    .panel,.kpi,.type,.lvl,.rescard,a.card,.ambito{box-shadow:none!important;break-inside:avoid}
+    .sec-title,header,h1,h4{break-after:avoid}
+    header{border-color:#000}
+    .kpis,.types,.levels,.grid2,.grid2b{gap:10px}
+  }
 </style>
 </head>
 <body>
@@ -93,6 +102,7 @@
   <nav class="topnav">
     <a class="brand" href="./">← Paneles de Acreditación UA</a>
     <div class="seg">
+      <a href="institucional.html">Institucional</a>
       <a href="postgrado.html">Postgrado</a>
       <a href="pregrado.html" class="on">Pregrado obligatorio</a>
       <a href="oferta.html">Oferta académica</a>
@@ -110,6 +120,7 @@
       Actualizado: <b id="ts">—</b><br>
       Ámbito: <b>Pregrado obligatorio</b> (oferta vigente)
       <br><button class="refresh" onclick="load()">↻ Actualizar</button>
+      <button class="refresh" onclick="window.print()">⭳ PDF</button>
     </div>
   </header>
 

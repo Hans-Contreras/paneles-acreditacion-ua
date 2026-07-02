@@ -100,6 +100,35 @@
   .setup code{background:var(--muted-soft);padding:2px 6px;border-radius:5px;font-size:12px;word-break:break-all}
   @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.levels{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
   @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+  .comp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .cstat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .cstat .n{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;font-variant-numeric:tabular-nums;line-height:1}
+  .cstat .l{font-size:11.5px;color:var(--ink-2);margin-top:5px}
+  .difflist h5{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;margin-bottom:8px}
+  .difflist ul{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto}
+  .difflist li{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline}
+  .difflist li:last-child{border-bottom:none}
+  .difflist li .tag2{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;flex:0 0 auto;letter-spacing:.03em}
+  .tag-in{background:var(--teal-soft);color:#0c5a4f}.tag-out{background:var(--danger-soft);color:var(--danger)}
+  .difflist .empty{font-size:12.5px;color:var(--ink-2);padding:6px 0}
+  .rescard{cursor:pointer}
+  .rescard .more{font-size:11.5px;color:var(--copper);font-weight:600;margin-top:10px;display:inline-block}
+  .tray{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;display:none;overflow-x:auto}
+  .tray.open{display:block}
+  .tray table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .tray th{text-align:left;color:var(--ink-2);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:4px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tray td{padding:5px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tray tr:last-child td{border-bottom:none}
+  .tray tr.now td{background:var(--amber-soft);font-weight:600}
+  @media print{
+    @page{margin:12mm}
+    body{padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .topnav,.refresh,.vigtoggle,.yearbar select,#status,.search-panel,.vighint{display:none!important}
+    .panel,.kpi,.type,.lvl,.rescard,a.card,.ambito{box-shadow:none!important;break-inside:avoid}
+    .sec-title,header,h1,h4{break-after:avoid}
+    header{border-color:#000}
+    .kpis,.types,.levels,.grid2,.grid2b{gap:10px}
+  }
 </style>
 </head>
 <body>
@@ -107,6 +136,7 @@
   <nav class="topnav">
     <a class="brand" href="./">← Paneles de Acreditación UA</a>
     <div class="seg">
+      <a href="institucional.html">Institucional</a>
       <a href="postgrado.html">Postgrado</a>
       <a href="pregrado.html">Pregrado obligatorio</a>
       <a href="oferta.html" class="on">Oferta académica</a>
@@ -124,6 +154,7 @@
       Actualizado: <b id="ts">—</b><br>
       Ámbito: <b>Universidad de Antofagasta</b>
       <br><button class="refresh" onclick="load()">↻ Actualizar</button>
+      <button class="refresh" onclick="window.print()">⭳ PDF</button>
     </div>
   </header>
 
@@ -190,6 +221,16 @@
       <h4>Programas ofertados por año</h4>
       <p class="cap" id="trendCap">Total de programas en la oferta anual. El punto marcado corresponde al año seleccionado.</p>
       <div id="trend"></div>
+    </div>
+
+    <div class="sec-title">Comparador año a año</div>
+    <div class="panel">
+      <p class="cap" id="compCap"></p>
+      <div class="comp-stats" id="compStats"></div>
+      <div class="grid2">
+        <div class="difflist"><h5>Entraron a la oferta</h5><ul id="entraron"></ul></div>
+        <div class="difflist"><h5>Salieron de la oferta</h5><ul id="salieron"></ul></div>
+      </div>
     </div>
 
     <footer>
@@ -296,6 +337,8 @@ function render(year){
 
   // Trend
   drawTrend(year);
+  // Comparador año a año
+  renderComparador(year);
   // refresh search results for the new year (if an active query)
   doSearch();
 }
@@ -313,9 +356,10 @@ function doSearch(){
   const shown=hits.slice(0,12);
   const f=(k,v)=>`<div class="f"><span class="k">${k}</span><span class="v">${v||'—'}</span></div>`;
   box.innerHTML=`<div class="res-count">${hits.length} resultado(s)${hits.length>12?' · mostrando 12':''} · año ${CUR_YEAR}</div>`+
-    shown.map(r=>{
+    shown.map((r,idx)=>{
       const vac=vacRow(r), ar=num(r["Arancel Anual"]), ai=norm(r["Año Inicio"]), dur=norm(r["Duración Total"]);
-      return `<div class="rescard">
+      const nameEsc=norm(r["Nombre Carrera"]).replace(/"/g,'&quot;');
+      return `<div class="rescard" onclick="toggleTray(${idx})">
         <div class="rt">${titleCase(norm(r["Nombre Carrera"]))}</div>
         <div class="rs">${norm(r["Código Único"])} · ${norm(r["Nivel Carrera"])} · ${norm(r["Área del conocimiento"])}</div>
         <div class="fg">
@@ -334,8 +378,57 @@ function doSearch(){
           ${f('Tipo de carrera',norm(r["Tipo Carrera"]))}
           ${f('Vigencia',norm(r["Vigencia"]))}
         </div>
+        <span class="more">Ver trayectoria por año ▾</span>
+        <div class="tray" id="tray-${idx}" data-name="${nameEsc}"></div>
       </div>`;
     }).join('');
+}
+
+function toggleTray(i){
+  const el=document.getElementById('tray-'+i);if(!el)return;
+  if(el.classList.contains('open')){el.classList.remove('open');return;}
+  if(!el.dataset.filled){
+    const key=stripAcc(norm(el.dataset.name).toLowerCase());
+    const byYear={};
+    ROWS.forEach(r=>{if(stripAcc(norm(r["Nombre Carrera"]).toLowerCase())===key){const y=norm(r["Año"]);(byYear[y]=byYear[y]||[]).push(r);}});
+    const years=Object.keys(byYear).sort();
+    const body=years.map(y=>{const g=byYear[y];const vac=g.reduce((s,r)=>s+vacRow(r),0);
+      const ac=g.some(isAcred)?'Acreditada':'No acreditada';
+      const ars=g.map(r=>num(r["Arancel Anual"])).filter(x=>x>0);const ar=ars.length?Math.max(...ars):0;
+      const nuevos=g.some(vigOK);
+      return `<tr class="${y===CUR_YEAR?'now':''}"><td>${y}</td><td>${ac}</td><td>${fmt(vac)}</td><td>${ar>0?'$'+fmt(ar):'—'}</td><td>${nuevos?'Con nuevos ingresos':'Sin nuevos ingresos'}</td></tr>`;}).join('');
+    el.innerHTML=`<table><thead><tr><th>Año</th><th>Acreditación</th><th>Vacantes</th><th>Arancel</th><th>Ingreso</th></tr></thead><tbody>${body}</tbody></table>`;
+    el.dataset.filled='1';
+  }
+  el.classList.add('open');
+}
+
+function renderComparador(year){
+  const idx=YEARS.indexOf(year);
+  const prev=idx>0?YEARS[idx-1]:null;
+  const filt=list=>VIG==='vig'?list.filter(vigOK):list;
+  const capEl=document.getElementById('compCap');
+  const stats=document.getElementById('compStats');
+  if(!prev){capEl.textContent=`No hay un año anterior en la serie para comparar (${year} es el primero disponible).`;
+    stats.innerHTML='';document.getElementById('entraron').innerHTML='';document.getElementById('salieron').innerHTML='';return;}
+  const cur=filt(ROWS.filter(r=>norm(r["Año"])===year));
+  const prv=filt(ROWS.filter(r=>norm(r["Año"])===prev));
+  const setC=new Map(cur.map(r=>[stripAcc(norm(r["Nombre Carrera"]).toLowerCase()),norm(r["Nombre Carrera"])]));
+  const setP=new Map(prv.map(r=>[stripAcc(norm(r["Nombre Carrera"]).toLowerCase()),norm(r["Nombre Carrera"])]));
+  const entraron=[...setC].filter(([k])=>!setP.has(k)).map(([,v])=>v);
+  const salieron=[...setP].filter(([k])=>!setC.has(k)).map(([,v])=>v);
+  const vacCur=cur.reduce((s,r)=>s+vacRow(r),0), vacPrev=prv.reduce((s,r)=>s+vacRow(r),0);
+  const dVac=vacCur-vacPrev, dProg=cur.length-prv.length;
+  capEl.innerHTML=`Comparación de la oferta ${VIG==='vig'?'vigente ':''}<b>${year}</b> respecto a <b>${prev}</b>.`;
+  const sign=n=>(n>0?'+':'')+fmt(n);
+  const col=n=>n>0?'var(--teal)':n<0?'var(--danger)':'var(--ink)';
+  stats.innerHTML=
+    `<div class="cstat"><div class="n" style="color:${col(dProg)}">${sign(dProg)}</div><div class="l">Variación de programas (${prv.length} → ${cur.length})</div></div>`+
+    `<div class="cstat"><div class="n" style="color:${col(dVac)}">${sign(dVac)}</div><div class="l">Variación de vacantes (${fmt(vacPrev)} → ${fmt(vacCur)})</div></div>`+
+    `<div class="cstat"><div class="n">${entraron.length} / ${salieron.length}</div><div class="l">Entraron / salieron de la oferta</div></div>`;
+  const li=(arr,cls,tag)=>arr.length?arr.sort().map(n=>`<li><span class="tag2 ${cls}">${tag}</span>${titleCase(n)}</li>`).join(''):'<div class="empty">Sin cambios respecto al año anterior.</div>';
+  document.getElementById('entraron').innerHTML=li(entraron,'tag-in','NUEVO');
+  document.getElementById('salieron').innerHTML=li(salieron,'tag-out','SALIÓ');
 }
 
 function groupCount(rows,key){const m={};rows.forEach(r=>{const k=norm(r[key])||"Sin dato";m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
