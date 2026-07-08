@@ -191,7 +191,7 @@
 </div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB3SzgWBmVkv4u4yC11ebw2MfLk5JzJA6k2-GAsbrIie5kh-e-T8IXbZqlyCM_BfKIiM3bDi49bguj/pub?gid=1393971926&single=true&output=csv";
+const CSV_URL = "https://raw.githubusercontent.com/Hans-Contreras/paneles-acreditacion-ua/main/data/acreditacion.csv";
 const TYPE_ORDER = ["Doctorado","Magíster","Especialidad Médica","Especialidad Odontológica"];
 const MESES={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
 const MS=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -211,7 +211,7 @@ function load(){
   document.getElementById('status').style.display='block';
   document.getElementById('content').style.display='none';
   document.getElementById('status').innerHTML='<div class="spin"></div>Conectando con la base de datos…';
-  Papa.parse(CSV_URL+"&_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
+  Papa.parse(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
     complete:res=>{try{render(res.data);}catch(e){err(e.message);}},
     error:e=>err(e.message)});
 }

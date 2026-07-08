@@ -164,7 +164,7 @@
 </div>
 
 <script>
-const ACRED_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB3SzgWBmVkv4u4yC11ebw2MfLk5JzJA6k2-GAsbrIie5kh-e-T8IXbZqlyCM_BfKIiM3bDi49bguj/pub?gid=1393971926&single=true&output=csv";
+const ACRED_URL = "https://raw.githubusercontent.com/Hans-Contreras/paneles-acreditacion-ua/main/data/acreditacion.csv";
 const SIES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtm2M25FF3mSo6DVCW_pb7fXgTlCR73W20Iy2doyic4vNFOSC5_o_CXPvBqtUVAw/pub?gid=1576346305&single=true&output=csv";
 const MESES={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
 const MS=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -181,7 +181,7 @@ function jkey(s){s=norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLow
 function parseVig(txt){if(!txt)return null;const m=norm(txt).toLowerCase().match(/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*(?:de\s*)?(\d{4})/);if(!m)return null;return new Date(parseInt(m[2],10),MESES[m[1]]+1,0);}
 function statusOf(d){if(!d)return{s:"ok",lbl:"Vigente"};const now=new Date();const in12=new Date();in12.setMonth(in12.getMonth()+12);if(d<now)return{s:"crit",lbl:"Vigencia superada"};if(d<in12)return{s:"soon",lbl:"< 12 meses"};return{s:"ok",lbl:"Vigente"};}
 function titleCase(s){return norm(s).toLowerCase().replace(/\b([a-záéíóúñ])/g,c=>c.toUpperCase()).replace(/\b(De|La|El|En|Y|Del|Los|Las|Para|Con|A)\b/g,w=>w.toLowerCase());}
-function fetchCSV(url){return new Promise((res,rej)=>Papa.parse(url+"&_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,complete:r=>res(r.data),error:rej}));}
+function fetchCSV(url){return new Promise((res,rej)=>Papa.parse(url+(url.includes("?")?"&":"?")+"_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,complete:r=>res(r.data),error:rej}));}
 
 function load(){
   document.getElementById('status').style.display='block';
