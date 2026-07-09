@@ -241,7 +241,7 @@
 </div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtm2M25FF3mSo6DVCW_pb7fXgTlCR73W20Iy2doyic4vNFOSC5_o_CXPvBqtUVAw/pub?gid=1576346305&single=true&output=csv";
+const CSV_URL = "https://raw.githubusercontent.com/Hans-Contreras/paneles-acreditacion-ua/main/data/oferta_sies.csv";
 const NIVEL_ORDER = ["Pregrado","Posgrado","Postítulo"];
 const norm=v=>(v==null?"":String(v)).trim();
 const num=v=>{const n=parseInt(String(v).replace(/[^\d-]/g,''),10);return isNaN(n)?0:n;};
@@ -264,7 +264,7 @@ function load(){
     return;
   }
   document.getElementById('status').innerHTML='<div class="spin"></div>Conectando con la base de datos…';
-  Papa.parse(CSV_URL+"&_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
+  Papa.parse(CSV_URL+(CSV_URL.includes("?")?"&":"?")+"_cb="+Date.now(),{download:true,header:true,skipEmptyLines:true,
     complete:res=>{try{init(res.data);}catch(e){err(e.message);}},error:e=>err(e.message)});
 }
 function err(m){document.getElementById('status').innerHTML='No se pudo cargar la planilla.<br><small>'+m+'</small><br><button class="refresh" onclick="load()">Reintentar</button>';}
