@@ -199,7 +199,7 @@ const isVig=r=>["sí","si"].includes(norm(r["Oferta Vigente"]).toLowerCase());
 const isAcred=r=>norm(r["Estado"]).toLowerCase()==="acreditado";
 const isProc=r=>/proceso/i.test(norm(r["Estado"]));
 const isNo=r=>/^no acred/i.test(norm(r["Estado"]));
-function activeStage(r){const e=norm(r["Etapa"]).toLowerCase();return e.startsWith("autoevaluaci")||e.includes("espera de decisi");}
+function activeStage(r){const e=norm(r["Etapa"]).toLowerCase();return e.startsWith("autoevaluaci")||e.includes("espera de decisi")||e.includes("evaluaci")||e.includes("plan")||e.includes("pendien")||e.includes("seguimi")||e.includes("redise");}
 function parseVig(txt){if(!txt)return null;const m=norm(txt).toLowerCase().match(/(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*(?:de\s*)?(\d{4})/);if(!m)return null;return new Date(parseInt(m[2],10),MESES[m[1]]+1,0);}
 function statusOf(d){if(!d)return{s:"ok",lbl:"Vigente"};const now=new Date();const in12=new Date();in12.setMonth(in12.getMonth()+12);if(d<now)return{s:"crit",lbl:"Vigencia superada"};if(d<in12)return{s:"soon",lbl:"< 12 meses"};return{s:"ok",lbl:"Vigente"};}
 const parseAnios=s=>{const m=norm(s).match(/(\d+)/);return m?parseInt(m[1],10):null;};
